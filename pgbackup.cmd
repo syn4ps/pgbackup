@@ -14,7 +14,7 @@ if "%1" == "clean" GOTO CLEAN
 :BACKUP
 IF [%2] == [] GOTO USAGE
 echo %date% %time% starting backup database %2 >>%logfile% 
-%pgdump% --dbname=%2 --username=%pguser% --compress=9 --file=%dumppath%%dumpname%.sql.zip 2>>%logfile%
+%pgdump% --dbname=%2 --username=%pguser% --compress=9 --file=%dumppath%%dumpname%.sql.gzip 2>>%logfile%
 IF NOT %ERRORLEVEL%==0 GOTO ERROR
 IF %ERRORLEVEL%==0 GOTO SUCCESS
 goto END

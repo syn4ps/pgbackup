@@ -80,7 +80,7 @@ goto END
 :OVERWRITERESTORE
 echo %date% %time% restore with overwrite database %2 from file %3 >>%logfile% 
 echo %date% %time% try to kill connections to database %2 >>%logfile% 
-"%pgbin%\psql.exe" -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = 'newtest';" >>%logfile% 
+"%pgbin%\psql.exe" -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = '%2';" >>%logfile% 
 echo %date% %time% try to drop database %2 >>%logfile% 
 "%pgbin%\dropdb.exe" --if-exists --username=%pguser% %2 2>>%logfile%
 IF NOT %ERRORLEVEL%==0 GOTO ERROR

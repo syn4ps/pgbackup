@@ -3,10 +3,9 @@
 set pgbin=c:\Program Files\PostgreSQL\12.4-1.1C\bin\
 set logfile=pgbackup.log
 set pguser=postgres
-set PGPASSWORD=***put your password here***
+set PGPASSWORD=*put your password here*
 set dumppath=f:\backup\data\
 set dumpname=%2-%date:~0,2%%date:~3,2%%date:~6,4%
-set keepdays=1
 
 IF [%1] == [] GOTO USAGE
 if "%1" == "backup" GOTO BACKUP
@@ -43,16 +42,21 @@ goto END
 :USAGE
 echo %date% %time% *** error required parameter not given  >>%logfile% 
 echo Usage: pgbackup command [database] [option]
+echo:
 echo Allowed commands: 
 echo:
-echo    backup database [sql]                     - for backup database in custom format, 
-echo                                                use sql option for plain sql backup
+echo    backup database [sql]                                  
+echo     - for backup database in custom format, 
+echo       use sql option for plain sql backup
 echo:
-echo    restore database dumpfilename [overwrite] - for restore database from backup
-echo                                                use overwrite option for silently 
-echo                                                overwrite existing database
+echo    restore database dumpfilename [tablespace] [overwrite]
+echo     - for restore database from backup
+echo       use overwrite option for silently 
+echo       overwrite existing database, 
+echo       optionally you can choose tablespace
 echo:
-echo    clean                                     - for clean old backup files
+echo    clean                                                  
+echo      - for clean old backup files
 goto END
 
 :RESTORE
@@ -63,8 +67,10 @@ if not exist %3 (
    echo Error can't open dump file %3 for restore >>%logfile%
    GOTO END
 )
-IF [%4] == [] GOTO USUALRESTORE
+
 IF "%4" == "overwrite" GOTO OVERWRITERESTORE
+IF [%5] == [] GOTO USUALRESTORE
+IF "%5" == "overwrite" GOTO OVERWRITERESTORE
 GOTO USAGE
 goto END
 
@@ -86,7 +92,13 @@ echo %date% %time% try to drop database %2 >>%logfile%
 IF NOT %ERRORLEVEL%==0 GOTO ERROR
 echo %date% %time% database %2 dropped succefully >>%logfile% 
 echo %date% %time% try to create database %2 >>%logfile% 
-"%pgbin%\createdb.exe" --username=%pguser%  %2 2>>%logfile%
+
+IF [%4] == [] (
+"%pgbin%\createdb.exe" --username=%pguser% %2 2>>%logfile%
+) else (
+"%pgbin%\createdb.exe" --username=%pguser% --tablespace=%4 %2 2>>%logfile%
+)
+
 IF NOT %ERRORLEVEL%==0 GOTO ERROR
 echo %date% %time% database %2 created succefully >>%logfile% 
 echo %date% %time% starting restore database %2 >>%logfile% 
@@ -97,7 +109,7 @@ goto END
 
 :CLEAN
 echo %date% %time% clean old backup files in %dumppath% >>%logfile% 
-forfiles /p %dumppath% /D -%keepdays% /C "cmd /c del /f /a /q @file"
+forfiles /p %dumppath% /D -1 /C "cmd /c del /f /a /q @file"
 goto END
 
 :ERROR

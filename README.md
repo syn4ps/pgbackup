@@ -4,14 +4,15 @@ Postgres windows cmd backup and restore script, before usage you need to put cor
 
 Allowed commands: 
 
-  backup database [sql]                     - for backup database in custom format, 
-                                              use sql option for plain sql backup
+  backup database [sql]                     
+  - for backup database in custom format, 
+    use sql option for plain sql backup
 
-  restore database dumpfilename [overwrite] - for restore database from backup
-                                              use overwrite option for silently 
-                                              overwrite existing database
+  restore database dumpfilename [tablespace] [overwrite] 
+  - for restore database from backup
+    use overwrite option for silently 
+    overwrite existing database
+    optionally you can choose tablespace
 
-   clean                                    - for clean old backup files
-   
-   
-   
+   clean                                    
+   - for clean old backup files
